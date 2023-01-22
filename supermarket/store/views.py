@@ -14,31 +14,21 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     
-    @action(detail=False, methods=['get'])
-    def category(self, request, *args, **kwargs):
+    def get_queryset(self):
+        queryset = Item.objects.all()
         category = self.request.query_params.get('category', None)
-        if category is not None:
-            items = Item.objects.filter(category=category)
-            serializer = self.get_serializer(items, many=True)
-            return Response(serializer.data)
-        else:
-            return Response({"error":"category not provided"})
-            
-    @action(detail=False, methods=['get'])
-    def subcategory(self, request, *args, **kwargs):
         subcategory = self.request.query_params.get('subcategory', None)
-        if subcategory is not None:
-            items = Item.objects.filter(subcategory=subcategory)
-            serializer = self.get_serializer(items, many=True)
-            return Response(serializer.data)
-        else:
-            return Response({"error":"subcategory not provided"})
+        if category is not None:
+            queryset = queryset.filter(category=category)
+        elif subcategory is not None:
+            queryset = queryset.filter(subcategory=subcategory)
+        return queryset
 
 class ItemCreateView(CreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
-class ItemUpdateView(UpdateAPIView):
+class ItemUpdateView(UpdateAPIView):                                        
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     lookup_field = 'id'
